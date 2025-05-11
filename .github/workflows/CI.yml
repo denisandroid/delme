@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+  pull_request:
+    branches:
+      - master
+      - dev
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  cargo-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    
+    - uses: actions/checkout@v3
+    - name: Run cargo deftest
+      run: cargo test --verbose
+    - name: Run cargo test nodeffeatures+lib
+      run: cargo test --no-default-features --lib --verbose
+    - name: Run cargo alltest
+      run: cargo test --all-features --verbose
+    - name: STD
+      run: cargo test --no-default-features --features std,point --lib --verbose --examples
+    - name: PL
+      run: cargo test --no-default-features --features pl,point --lib --verbose --examples
+    - name: ASYNC(TOKIO)
+      run: cargo test --no-default-features --features async,point --lib --verbose --tests
