@@ -31,7 +31,7 @@ jobs:
           target/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
     
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Run cargo deftest
       run: cargo test --verbose
     - name: Run cargo test nodeffeatures+lib
